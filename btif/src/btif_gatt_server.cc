@@ -121,6 +121,8 @@ static void btapp_gatts_free_req_data(uint16_t event, tBTA_GATTS* p_data) {
       break;
   }
 }
+extern void rk_hcic_ble_set_adv_enable(uint8_t adv_enable);
+extern uint8_t getrkbleAdvEnable();
 
 static void btapp_gatts_handle_cback(uint16_t event, char* p_param) {
   LOG_VERBOSE(LOG_TAG, "%s: Event %d", __func__, event);
@@ -141,7 +143,6 @@ static void btapp_gatts_handle_cback(uint16_t event, char* p_param) {
     case BTA_GATTS_CONNECT_EVT: {
       btif_gatt_check_encrypted_link(p_data->conn.remote_bda,
                                      p_data->conn.transport);
-
       HAL_CBACK(bt_gatt_callbacks, server->connection_cb, p_data->conn.conn_id,
                 p_data->conn.server_if, true, p_data->conn.remote_bda);
       break;
@@ -150,6 +151,8 @@ static void btapp_gatts_handle_cback(uint16_t event, char* p_param) {
     case BTA_GATTS_DISCONNECT_EVT: {
       HAL_CBACK(bt_gatt_callbacks, server->connection_cb, p_data->conn.conn_id,
                 p_data->conn.server_if, false, p_data->conn.remote_bda);
+	  ALOGD("getrkbleAdvEnable %x",getrkbleAdvEnable());
+	  if(getrkbleAdvEnable())rk_hcic_ble_set_adv_enable(0x01);
       break;
     }
 

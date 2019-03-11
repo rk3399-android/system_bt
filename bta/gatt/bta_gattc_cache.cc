@@ -1418,6 +1418,7 @@ void bta_gattc_cache_save(tBTA_GATTC_SERV* p_srvc_cb, uint16_t conn_id) {
   osi_free(nv_attr);
 }
 
+#define RK_DONOTLOAD_GATT_CACH 1
 /*******************************************************************************
  *
  * Function         bta_gattc_cache_load
@@ -1430,6 +1431,8 @@ void bta_gattc_cache_save(tBTA_GATTC_SERV* p_srvc_cb, uint16_t conn_id) {
  *
  ******************************************************************************/
 bool bta_gattc_cache_load(tBTA_GATTC_CLCB* p_clcb) {
+  if(RK_DONOTLOAD_GATT_CACH)
+    return false;  
   char fname[255] = {0};
   bta_gattc_generate_cache_file_name(fname, sizeof(fname),
                                      p_clcb->p_srcb->server_bda);

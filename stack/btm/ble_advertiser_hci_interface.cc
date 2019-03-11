@@ -48,6 +48,9 @@ extern void btu_hcif_send_cmd_with_cb(
     const tracked_objects::Location& posted_from, uint16_t opcode,
     uint8_t* params, uint8_t params_len, hci_cmd_cb cb);
 
+extern void setrkbleAdvEnable(uint8_t enable);
+
+
 namespace {
 BleAdvertiserHciInterface* instance = nullptr;
 
@@ -429,6 +432,7 @@ class BleAdvertiserLegacyHciInterfaceImpl : public BleAdvertiserHciInterface {
 
     uint8_t* pp = param;
     UINT8_TO_STREAM(pp, enable);
+    setrkbleAdvEnable(enable);
 
     SendAdvCmd(FROM_HERE, HCI_BLE_WRITE_ADV_ENABLE, param,
                HCIC_PARAM_SIZE_WRITE_ADV_ENABLE, command_complete);

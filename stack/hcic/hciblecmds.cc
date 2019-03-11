@@ -28,6 +28,7 @@
 #include "btu.h"
 #include "hcidefs.h"
 #include "hcimsgs.h"
+#include <log/log.h>
 
 #include <base/bind.h>
 #include <stddef.h>
@@ -146,10 +147,19 @@ void btsnd_hcic_ble_set_scan_rsp_data(uint8_t data_len, uint8_t* p_scan_rsp) {
   btu_hcif_send_cmd(LOCAL_BR_EDR_CONTROLLER_ID, p);
 }
 
+static uint8_t rkbleAdvEnable =0x00;
+void setrkbleAdvEnable(uint8_t enable) {
+  rkbleAdvEnable= enable;
+}
+uint8_t getrkbleAdvEnable(){
+  return rkbleAdvEnable;
+}
+
 void btsnd_hcic_ble_set_adv_enable(uint8_t adv_enable) {
   BT_HDR* p = (BT_HDR*)osi_malloc(HCI_CMD_BUF_SIZE);
   uint8_t* pp = (uint8_t*)(p + 1);
-
+  rkbleAdvEnable = adv_enable;
+  ALOGE("btsnd_hcic_ble_set_adv_enable bleAdvEnable %x",rkbleAdvEnable);
   p->len = HCIC_PREAMBLE_SIZE + HCIC_PARAM_SIZE_WRITE_ADV_ENABLE;
   p->offset = 0;
 
@@ -160,6 +170,20 @@ void btsnd_hcic_ble_set_adv_enable(uint8_t adv_enable) {
 
   btu_hcif_send_cmd(LOCAL_BR_EDR_CONTROLLER_ID, p);
 }
+void rk_hcic_ble_set_adv_enable(uint8_t adv_enable) {
+  BT_HDR* p = (BT_HDR*)osi_malloc(HCI_CMD_BUF_SIZE);
+  uint8_t* pp = (uint8_t*)(p + 1);
+  p->len = HCIC_PREAMBLE_SIZE + HCIC_PARAM_SIZE_WRITE_ADV_ENABLE;
+  p->offset = 0;
+
+  UINT16_TO_STREAM(pp, HCI_BLE_WRITE_ADV_ENABLE);
+  UINT8_TO_STREAM(pp, HCIC_PARAM_SIZE_WRITE_ADV_ENABLE);
+
+  UINT8_TO_STREAM(pp, adv_enable);
+
+  btu_hcif_send_cmd(LOCAL_BR_EDR_CONTROLLER_ID, p);
+}
+
 void btsnd_hcic_ble_set_scan_params(uint8_t scan_type, uint16_t scan_int,
                                     uint16_t scan_win, uint8_t addr_type_own,
                                     uint8_t scan_filter_policy) {
